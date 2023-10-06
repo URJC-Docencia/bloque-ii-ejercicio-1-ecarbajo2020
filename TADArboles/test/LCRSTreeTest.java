@@ -1,15 +1,7 @@
 import material.Position;
-import org.junit.Test;
-//import org.testng.annotations.Test;
+import org.junit.*;
 
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.fail;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-//import static org.testng.AssertJUnit.assertFalse;
-//import static org.testng.AssertJUnit.assertTrue;
-
-
+import static org.junit.Assert.*;
 /**
  * This class is a test class for the LCRSTree class.
  * It includes various test methods to test the functionalities of the LCRSTree class.
@@ -18,7 +10,12 @@ public class LCRSTreeTest {
 
 
 
-    private LCRSTree<Integer> tree = new LCRSTree<>();
+    private LCRSTree<Integer> tree;
+
+    @Before
+    public void setUp() throws Exception {
+        tree = new LCRSTree<>();
+    }
 
     public void setTree() {
 
@@ -241,6 +238,30 @@ public class LCRSTreeTest {
     }
 
 
+
+    @Test
+    public void testIteratorPreOrder(){
+        this.setTree();
+        StringBuilder s = new StringBuilder();
+        var it = this.tree.iteratorPreOrder();
+        while(it.hasNext()){
+            s.append(it.next().getElement());
+        }
+        assertEquals("123567891011124", s.toString());
+    }
+
+
+    @Test
+    public void testIteratorPostOrder(){
+        this.setTree();
+        StringBuilder s = new StringBuilder();
+        var it = this.tree.iteratorPostOrder();
+        while(it.hasNext()){
+            s.append(it.next().getElement());
+        }
+        assertEquals("257910111286341", s.toString());
+    }
+
     @Test
     public void testIsRoot() {
         this.setTree();
@@ -314,5 +335,47 @@ public class LCRSTreeTest {
             salida.append(e.getElement());
         }
         assertEquals(salida.toString(), "-12-245-37-49101112");
+    }
+
+
+    @Test
+    public void testAttachTree(){
+        LCRSTree<Integer> tree2 = new LCRSTree<>();
+        Position<Integer> p = tree.addRoot(1);
+        tree.add(2, p);
+        Position<Integer> p1 = tree.add(3, p);
+        tree.add(4, p);
+        tree.add(5, p1);
+        Position<Integer> p2 = tree.add(6, p1);
+        tree.add(7, p2);
+        Position<Integer> p3 = tree.add(8, p2);
+        tree.add(9, p3);
+        tree.add(10, p3);
+        tree.add(11, p3);
+        tree.add(12, p3);
+
+        Position<Integer> p4 = tree2.addRoot(100);
+        tree2.add(200, p4);
+        tree2.add(300, p4);
+        tree2.add(400, p4);
+        tree2.add(500, p4);
+        tree2.add(600, p4);
+        tree2.add(700, p4);
+        tree2.add(800, p4);
+        tree2.add(900, p4);
+        tree2.add(1000, p4);
+        tree2.add(1100, p4);
+        tree2.add(1200, p4);
+        tree2.add(1300, p4);
+
+        this.tree.attach(p3, tree2);
+
+        StringBuilder salida = new StringBuilder();
+        for (Position<Integer> e : this.tree) {
+            salida.append(e.getElement());
+        }
+        assertEquals(salida.toString(), "1234567891011121002003004005006007008009001000110012001300");
+
+
     }
 }

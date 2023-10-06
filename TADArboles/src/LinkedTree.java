@@ -39,13 +39,13 @@ public class LinkedTree<E> extends DrawableTree<E> {
             return children;
         }
 
-        public TreeNode<T> getParents() {
+        public TreeNode<T> getParent() {
             return parent;
         }
 
         @Override
         public T getElement() {
-            throw new UnsupportedOperationException("Not supported yet.");
+            return element;
         }
 
     }
@@ -63,6 +63,18 @@ public class LinkedTree<E> extends DrawableTree<E> {
         return root;
     }
 
+
+
+    @Override
+    public Position<E> add(E element, Position<E> p) {
+        TreeNode<E> parent = checkPosition(p);
+        TreeNode<E> newNode = new TreeNode<>(element, parent);
+        parent.getChildren().add(newNode);
+        size++;
+        return newNode;
+
+    }
+
     /** Check if a given position is valid and return the corresponding TreeNode.
      *
      * @param p The position to check
@@ -77,10 +89,11 @@ public class LinkedTree<E> extends DrawableTree<E> {
     }
 
     @Override
-    public Position<E> add(E element, Position<E> p) {
+    public Position<E> add(E element, Position<E> p, int n) {
         TreeNode<E> parent = checkPosition(p);
         TreeNode<E> newNode = new TreeNode<>(element, parent);
-        parent.getChildren().add(newNode);
+        checkPositionOfChildrenList(n,parent);
+        parent.getChildren().add(n, newNode);
         size++;
         return newNode;
 
@@ -100,16 +113,7 @@ public class LinkedTree<E> extends DrawableTree<E> {
     }
 
 
-    @Override
-    public Position<E> add(E element, Position<E> p, int n) {
-        TreeNode<E> parent = checkPosition(p);
-        checkPositionOfChildrenList(n,parent);
-        TreeNode<E> newNode = new TreeNode<>(element, parent);
-        parent.getChildren().add(newNode);
-        size++;
-        return newNode;
 
-    }
 
     @Override
     public void swapElements(Position<E> p1, Position<E> p2) {
@@ -136,7 +140,7 @@ public class LinkedTree<E> extends DrawableTree<E> {
             root = null;
             size = 0;
         } else{
-            TreeNode<E> parent = node.getParents();
+            TreeNode<E> parent = node.getParent();
             parent.getChildren().remove(node);
             //resta a size el tamaño del nodo
             size -=computeSize(node);
@@ -163,7 +167,18 @@ public class LinkedTree<E> extends DrawableTree<E> {
 
     @Override
     public void attach(Position<E> p, NAryTree<E> t) {
+        TreeNode<E> node = checkPosition(p);
+        LinkedTree<E> tree = checkTree(t);
+        node.getChildren().addAll(tree.root.getChildren());
+        size += tree.size;
 
+    }
+
+    private LinkedTree<E> checkTree(NAryTree<E> t) {
+        if (!(t instanceof LinkedTree)) {
+            throw new RuntimeException("The tree is invalid");
+        }
+        return (LinkedTree<E>) t;
     }
 
     @Override
@@ -178,27 +193,34 @@ public class LinkedTree<E> extends DrawableTree<E> {
 
     @Override
     public Position<E> parent(Position<E> v) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        TreeNode<E> node = checkPosition(v);
+        return node.getParent();
     }
 
     @Override
     public Iterable<? extends Position<E>> children(Position<E> v) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        TreeNode<E> node = checkPosition(v);
+        return node.getChildren();
     }
 
     @Override
     public boolean isInternal(Position<E> v) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        TreeNode<E> node = checkPosition(v);
+        return !node.getChildren().isEmpty();
+
     }
 
     @Override
     public boolean isLeaf(Position<E> v) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        TreeNode<E> node = checkPosition(v);
+        return node.getChildren().isEmpty();
     }
 
     @Override
     public boolean isRoot(Position<E> v) {
-        throw new UnsupportedOperationException("Not supported yet.");
+
+        TreeNode<E> node = checkPosition(v);
+        return node == root;
     }
 
     @Override
@@ -209,17 +231,62 @@ public class LinkedTree<E> extends DrawableTree<E> {
         return positions.iterator();
     }
 
+    public Iterator<Position<E>> iteratorPreOrder() {
+        if (isEmpty()) {
+            // empty iterator
+            return new ArrayList<Position<E>>().iterator();
+        }
+        List<Position<E>> positions = new ArrayList<>();
+        preOrderTraversal(root, positions);
+        return positions.iterator();
+    }
+
+
+    public Iterator<Position<E>> iteratorPostOrder() {
+        if (isEmpty()) {
+            // empty iterator
+            return new ArrayList<Position<E>>().iterator();
+        }
+        List<Position<E>> positions = new ArrayList<>();
+        postOrderTraversal(root, positions);
+        return positions.iterator();
+    }
+
+
     private void breadthOrder(TreeNode<E> node, List<Position<E>> positions){
         if (node != null){
-            List<TreeNode> queue = new ArrayList<>();
+            List<TreeNode<E>> queue = new ArrayList<>();
             queue.add(node);
             while(!queue.isEmpty()){
                 TreeNode<E> toExplore = queue.remove(0);
                 positions.add(toExplore);
-                queue.addAll(node.getChildren());
+                queue.addAll(toExplore.getChildren());
             }
         }
     }
+
+    private void breadthFirstTraversal(TreeNode<E> root, List<Position<E>> positions) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    private void postOrderTraversal(TreeNode<E> node, List<Position<E>> positions) {
+        if (node != null) {
+            for (TreeNode<E> child : node.getChildren()) {
+                postOrderTraversal(child, positions);
+            }
+            positions.add(node);
+        }
+    }
+
+    private void preOrderTraversal(TreeNode<E> node, List<Position<E>> positions) {
+        if (node != null){
+            positions.add(node);
+            for (TreeNode<E> child : node.getChildren()) {
+                preOrderTraversal(child, positions);
+            }
+        }
+    }
+
 
     public int size() {
         return size;

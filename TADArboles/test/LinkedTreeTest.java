@@ -94,7 +94,7 @@ public class LinkedTreeTest extends TestCase {
 
     public void testRemove() {
         Position<String> p = this.tree.addRoot("+");
-        Position<String> q = this.tree.add("2", p);
+        this.tree.add("2", p);
         Position<String> h = this.tree.add("*", p);
         this.tree.add("3", h);
         this.tree.add("5", h);
@@ -202,9 +202,31 @@ public class LinkedTreeTest extends TestCase {
         assertEquals(s.toString(), "ABCDEFGHIJKL");
     }
 
+
+    public void testIteratorPreOrder(){
+        this.setTree();
+        StringBuilder s = new StringBuilder();
+        var it = this.tree.iteratorPreOrder();
+        while(it.hasNext()){
+            s.append(it.next().getElement());
+        }
+        assertEquals("ABCEFGHIJKLD", s.toString());
+    }
+
+
+    public void testIteratorPostOrder(){
+        this.setTree();
+        StringBuilder s = new StringBuilder();
+        var it = this.tree.iteratorPostOrder();
+        while(it.hasNext()){
+            s.append(it.next().getElement());
+        }
+        assertEquals("BEGIJKLHFCDA", s.toString());
+    }
+
     public void testIsRoot() {
         this.setTree();
-        assertEquals(this.tree.root().getElement(), "A");
+        assertEquals("A", this.tree.root().getElement());
 
     }
 
